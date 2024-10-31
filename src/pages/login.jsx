@@ -27,15 +27,24 @@ export const Login = () => {
     request
       .post("/login", data)
       .then((res) => {
-        saveState('user',res.data);
-        navigate("/app", {
-          replace: true,
-        });
+        if (res.status === 200 || res.status === 201) {
+          const userData = {
+            accessToken: res.data.accessToken,
+            user: res.data.user
+          };
+          saveState("user", userData);
+          toast.success("Login successful!");
+          navigate("/app", {
+            replace: true,
+          });
+        }
       })
       .catch((error) => {
-        toast.error(error.response.data);
+        toast.error(error.response?.data?.message || "Invalid credentials");
+        console.error("Login error:", error);
       });
   };
+
   return (
     <>
       <div className="absolute w-[400px] p-[20px] text-white rounded-md bg-blue-900 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
@@ -48,30 +57,34 @@ export const Login = () => {
         >
           <div className="mt-[20px]">
             <input
-              className="p-[10px] w-full text-black"
+              className="p-[10px] w-full text-black placeholder:text-gray-500"
               type="email"
               {...register("email")}
-              placeholder="email"
+              placeholder="Enter your email"
             />
-            {errors.email && <p>{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 mt-1 text-sm">{errors.email.message}</p>
+            )}
           </div>
           <div className="mt-[20px]">
             <input
-              className="p-[10px] w-full text-black"
+              className="p-[10px] w-full text-black placeholder:text-gray-500"
               type="password"
               {...register("password")}
-              placeholder="password"
+              placeholder="Enter your password"
             />
-            {errors.password && <p>{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 mt-1 text-sm">{errors.password.message}</p>
+            )}
           </div>
-          <div className="flex items-center gap-2 ">
-            <p>don't have and accaunt ? </p>
+          <div className="flex items-center gap-2">
+            <p>Don't have an account?</p>
             <Link to="/register" className="flex items-center gap-2">
-              <p className="text-red-500 text-[18px] font-medium">Sign Up</p>
+              <p className="text-red-500 text-[18px] font-medium hover:text-red-400">Sign Up</p>
             </Link>
           </div>
-          <button className="bg-green-500 p-[10px] mt-[20px] w-full rounded-md text-[20px] font-medium">
-            Send
+          <button className="bg-green-500 p-[10px] mt-[20px] w-full rounded-md text-[20px] font-medium hover:bg-green-600 transition-colors">
+            Login
           </button>
         </form>
       </div>

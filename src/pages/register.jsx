@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { z } from "zod";
 
 const loginSchema = z.object({
+  name: z.string().min(1, "Name is required"),
   email: z.string().email("Please enter your email in the correct format"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
@@ -27,12 +28,13 @@ export const Register = () => {
     request
       .post("/register", data)
       .then((res) => {
-        if (res.status == 200 || res.status > 200) {
+        if (res.status === 200 || res.status === 201) {
+          toast.success("Registration successful!");
           navigate("/");
         }
       })
       .catch((error) => {
-        toast.error(error.response.data);
+        toast.error(error.response?.data?.message || "Registration failed");
       });
   };
 
@@ -41,7 +43,7 @@ export const Register = () => {
       <h1 className="text-[30px] font-medium text-white text-center">
         Register
       </h1>
-      
+
       <form
         className="mt-[20px] flex flex-col gap-4"
         onSubmit={handleSubmit(submit)}
@@ -53,7 +55,7 @@ export const Register = () => {
             {...register("name")}
             placeholder="name"
           />
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
         </div>
         <div className="mt-[20px]">
           <input
@@ -62,7 +64,7 @@ export const Register = () => {
             {...register("email")}
             placeholder="email"
           />
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.email && <p className="text-red-500">{errors.email.message}</p>}
         </div>
         <div className="mt-[20px]">
           <input
@@ -71,10 +73,16 @@ export const Register = () => {
             {...register("password")}
             placeholder="password"
           />
+          {errors.password && <p className="text-red-500">{errors.password.message}</p>}
         </div>
         <div className="link flex items-center gap-3 text-center w-full">
-            <p className="text-red-500">If you have an account, click the </p>
-            <Link to="/" className="text-[18px] text-white font-medium hover:text-green-500">Sign In</Link>
+          <p className="text-red-500">If you have an account, click the </p>
+          <Link
+            to="/"
+            className="text-[18px] text-white font-medium hover:text-green-500"
+          >
+            Sign In
+          </Link>
         </div>
         <button className="bg-green-500 p-[10px] mt-[20px] w-full rounded-md text-[20px] font-medium">
           Submit
